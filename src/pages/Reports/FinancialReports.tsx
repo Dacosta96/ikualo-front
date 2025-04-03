@@ -29,7 +29,7 @@ const sampleData = [
   },
 ];
 
-export default function LineChart() {
+export default function FinancialReports() {
   return (
     <>
       <PageMeta

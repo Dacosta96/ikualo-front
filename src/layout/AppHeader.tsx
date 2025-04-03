@@ -2,10 +2,11 @@ import { Link } from "react-router";
 import { useState } from "react";
 import { FiLogOut } from "react-icons/fi";
 import { useNavigate } from "react-router";
-import { useAuth } from "@clerk/clerk-react";
+import { useAuth, useUser } from "@clerk/clerk-react";
 import { useBalance } from "../context/BalanceContext";
 
 const AppHeader: React.FC = () => {
+  const { user } = useUser();
   const [isOpen, setIsOpen] = useState(false);
   const { signOut } = useAuth();
   const navigate = useNavigate();
@@ -18,14 +19,11 @@ const AppHeader: React.FC = () => {
       console.error("Error al cerrar sesión:", error);
     }
   };
-
+  console.log("user", user);
   return (
     <header className="bg-white shadow-md mb-2">
       <div className="max-w-screen-xl mx-auto flex items-center justify-between p-4">
-        {/* Logo */}
-        <Link to="/home" className="flex items-center">
-          <img src="/" alt="Logo" className="h-16 md:h-20 lg:h-24 w-auto" />
-        </Link>
+        <h1 className="text-xl font-bold">Hola, {user?.firstName} </h1>
 
         {/* Navegación - Desktop */}
         <nav className="hidden md:flex items-center space-x-6">
@@ -35,7 +33,11 @@ const AppHeader: React.FC = () => {
               balance >= 0 ? "text-green-600" : "text-red-600"
             }`}
           >
-            Capital: ${balance.toFixed(2)}
+            Capital:{" "}
+            {`$ ${new Intl.NumberFormat("es-ES", {
+              minimumFractionDigits: 1,
+              maximumFractionDigits: 1,
+            }).format(balance)}`}
           </span>
 
           {/* Mi perfil */}
@@ -103,7 +105,11 @@ const AppHeader: React.FC = () => {
                 balance >= 0 ? "text-green-600" : "text-red-600"
               }`}
             >
-              Capital: ${balance.toFixed(2)}
+              Capital:{" "}
+              {`$ ${new Intl.NumberFormat("es-ES", {
+                minimumFractionDigits: 1,
+                maximumFractionDigits: 1,
+              }).format(balance)}`}
             </li>
             <li>
               <Link

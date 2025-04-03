@@ -19,15 +19,15 @@ export default function AuthLayout({
         <div className="relative hidden w-full h-full lg:w-1/2 lg:flex items-center justify-center">
           <div
             className="absolute inset-0 bg-cover bg-center opacity-50"
-            style={{ backgroundImage: "url('/images/centroLogistico.webp')" }}
+            style={{ backgroundImage: "url('/images/imgLogIn.jpeg')" }}
           ></div>
 
           {/* Contenido sobre la imagen */}
           <div className="relative flex flex-col items-center max-w-xs text-white z-10">
             <Link to="/" className="block mb-6 md:mb-8">
               <img
-                className="w-48 md:w-56 lg:w-64" // Ajuste responsive del logo
-                src="/images/logo/logo-coordinadora.png"
+                className="w-32 md:w-40 lg:w-48 rounded-lg"
+                src="/images/logo.png"
                 alt="Logo"
               />
             </Link>

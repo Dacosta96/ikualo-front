@@ -1,17 +1,25 @@
 import React, { useEffect, useState } from "react";
 import { DataGrid, GridColDef, GridToolbar } from "@mui/x-data-grid";
-//import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { deleteMovement, getMovementsByEmail } from "../../api/movementAction";
+import {
+  deleteMovement,
+  getMovementsByEmail,
+  updateMovement,
+} from "../../api/movementAction";
 import { useUser } from "@clerk/clerk-react";
 import { IconButton } from "@mui/material";
 import { FiEdit, FiTrash2 } from "react-icons/fi";
 import EditMovementModal from "./modals/editMovements";
 import DeleteMovementModal from "./modals/deleteMovement";
 import { toast } from "react-toastify";
+import { useBalance } from "../../context/BalanceContext";
+import { getUserByEmail } from "../../api/usersAction";
+import { format } from "date-fns";
+import { es } from "date-fns/locale";
 
 const OrdersAdmin: React.FC = () => {
   const { user } = useUser();
+  const { setBalance } = useBalance();
   const [transactions, setTransactions] = useState<any[]>([]);
   const [pagination, setPagination] = useState({
     total: 0,
@@ -26,18 +34,24 @@ const OrdersAdmin: React.FC = () => {
   const [openEditModal, setOpenEditModal] = useState(false);
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
   const [rowToDelete, setRowToDelete] = useState<any>(null);
+  const [rowToEdit, setRowToEdit] = useState<any>(null);
   const [isLoadingDelete, setIsLoadingDelete] = useState(false);
+  const [isLoadingEdit, setIsLoadingEdit] = useState(false);
 
   const handleEdit = async (e: React.MouseEvent, row: any) => {
     e.preventDefault();
-    console.log("row", row);
-    console.log("formData", formData);
+    setRowToEdit(row);
+    setFormData({
+      amount: row.amount,
+      date: row.date,
+      description: row.description,
+    });
     setOpenEditModal(true);
   };
 
   const handleDelete = async (row: any) => {
     console.log("row", row);
-    setRowToDelete(row); // Guarda el movimiento a eliminar
+    setRowToDelete(row);
     setOpenDeleteModal(true);
   };
 
@@ -47,11 +61,23 @@ const OrdersAdmin: React.FC = () => {
         user?.primaryEmailAddress?.emailAddress || ""
       );
 
-      // Asegurar que cada objeto tenga una propiedad `id`
       const formattedMovements = movements.map((item: any) => ({
         ...item,
         id: item._id, // Asigna `_id` como `id`
+        type: item.type === "income" ? "Ingreso" : "Gasto", // Formatear type
+        date: format(new Date(item.date), "dd/MM/yyyy", { locale: es }), // Formatear fecha
+        amount: `$ ${new Intl.NumberFormat("es-ES", {
+          minimumFractionDigits: 1,
+          maximumFractionDigits: 1,
+        }).format(item.amount)}`,
       }));
+
+      console.log(formattedMovements);
+
+      const userData = await getUserByEmail(
+        user?.primaryEmailAddress?.emailAddress || ""
+      );
+      setBalance(userData?.capital || 0);
 
       setTransactions(formattedMovements);
 
@@ -131,6 +157,35 @@ const OrdersAdmin: React.FC = () => {
     }
   };
 
+  const confirmEdit = async (event: React.FormEvent) => {
+    event.preventDefault();
+    if (!rowToEdit) return;
+    setIsLoadingEdit(true);
+    console.log("formData", formData);
+    console.log("rowToEdit", rowToEdit);
+
+    try {
+      const response = await updateMovement({
+        _id: rowToEdit._id,
+        amount: parseFloat(formData.amount) || 0,
+        type: rowToEdit.type,
+        date: formData.date,
+        description: formData.description,
+      });
+      console.log("Movimiento actualizado:", response);
+      if (response) {
+        toast.success("Movimiento actualizado correctamente");
+        setIsLoadingEdit(false);
+      }
+      fetchMovementsData();
+      setOpenEditModal(false);
+      setRowToEdit(null);
+    } catch (error) {
+      toast.error("Error al actualizar el movimiento");
+      setIsLoadingEdit(false);
+      console.error("Error actualizando el movimiento", error);
+    }
+  };
   return (
     <div
       style={{
@@ -161,11 +216,11 @@ const OrdersAdmin: React.FC = () => {
           }
           rowCount={pagination.total}
           paginationMode="client"
-          autoHeight // Permite que la tabla solo ocupe el espacio necesario
+          autoHeight
           sx={{
             "& .MuiDataGrid-root": { overflowX: "auto" },
-            minHeight: "200px", // Asegura que haya una altura mínima cuando hay pocas filas
-            maxHeight: "calc(100vh - 200px)", // Evita que ocupe toda la pantalla en exceso
+            minHeight: "200px",
+            maxHeight: "calc(100vh - 200px)",
           }}
         />
       </div>
@@ -177,11 +232,8 @@ const OrdersAdmin: React.FC = () => {
         formData={formData}
         handleChange={handleChange}
         handleDateChange={handleDateChange}
-        handleSubmit={(event) => {
-          event.preventDefault();
-          setOpenEditModal(false);
-          console.log("formData", formData);
-        }}
+        handleSubmit={(event) => confirmEdit(event)}
+        isLoading={isLoadingEdit}
       />
 
       <DeleteMovementModal

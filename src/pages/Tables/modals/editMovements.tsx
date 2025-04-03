@@ -15,6 +15,7 @@ interface EditMovementModalProps {
   handleChange: (data: { name: string; value: string }) => void;
   handleDateChange: (date: Date[]) => void;
   handleSubmit: (event: React.FormEvent) => void;
+  isLoading: boolean;
 }
 
 const EditMovementModal: React.FC<EditMovementModalProps> = ({
@@ -24,7 +25,9 @@ const EditMovementModal: React.FC<EditMovementModalProps> = ({
   handleChange,
   handleDateChange,
   handleSubmit,
+  isLoading,
 }) => {
+  console.log("formDataModal", formData);
   return (
     <Modal
       isOpen={isOpen}
@@ -114,8 +117,9 @@ const EditMovementModal: React.FC<EditMovementModalProps> = ({
             <button
               type="submit"
               className="px-4 py-2 bg-blue-600 text-white rounded"
+              disabled={isLoading}
             >
-              Guardar
+              {isLoading ? "Pendiente..." : "Guardar"}
             </button>
           </div>
         </form>

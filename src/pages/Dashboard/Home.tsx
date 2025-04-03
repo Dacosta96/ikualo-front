@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { FiArrowDownCircle, FiArrowUpCircle } from "react-icons/fi";
-//import axiosInstance from "../../api/api";
 import Label from "../../components/form/Label";
 import Input from "../../components/form/input/InputField";
 import PageMeta from "../../components/common/PageMeta";
@@ -31,8 +30,6 @@ export default function Home() {
     date: new Date().toISOString().split("T")[0],
   });
   const [loading, setLoading] = useState(false);
-
-  //console.log("axiosInstance", axiosInstance.get(""));
 
   const fetchMovementsData = async () => {
     try {
