@@ -19,7 +19,7 @@ const AppHeader: React.FC = () => {
       console.error("Error al cerrar sesión:", error);
     }
   };
-  console.log("user", user);
+
   return (
     <header className="bg-white shadow-md mb-2">
       <div className="max-w-screen-xl mx-auto flex items-center justify-between p-4">
