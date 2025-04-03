@@ -3,12 +3,13 @@ import { useState } from "react";
 import { FiLogOut } from "react-icons/fi";
 import { useNavigate } from "react-router";
 import { useAuth } from "@clerk/clerk-react";
+import { useBalance } from "../context/BalanceContext";
 
 const AppHeader: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
   const { signOut } = useAuth();
   const navigate = useNavigate();
-
+  const { balance } = useBalance();
   const handleLogout = async () => {
     try {
       await signOut(); // Cierra sesión en Clerk
@@ -20,20 +21,32 @@ const AppHeader: React.FC = () => {
 
   return (
     <header className="bg-white shadow-md mb-2">
-      <div className="max-w-screen-xl mx-auto flex items-center justify-between">
+      <div className="max-w-screen-xl mx-auto flex items-center justify-between p-4">
         {/* Logo */}
         <Link to="/home" className="flex items-center">
           <img src="/" alt="Logo" className="h-16 md:h-20 lg:h-24 w-auto" />
         </Link>
 
-        {/* Botones de navegación - Desktop */}
-        <nav className="hidden md:flex space-x-4">
+        {/* Navegación - Desktop */}
+        <nav className="hidden md:flex items-center space-x-6">
+          {/* Saldo */}
+          <span
+            className={`font-semibold ${
+              balance >= 0 ? "text-green-600" : "text-red-600"
+            }`}
+          >
+            Capital: ${balance.toFixed(2)}
+          </span>
+
+          {/* Mi perfil */}
           <Link
             to="/profile-user"
             className="px-4 py-2 text-gray-700 hover:text-blue-600"
           >
             Mi perfil
           </Link>
+
+          {/* Botón de salir */}
           <button
             onClick={handleLogout}
             className="flex items-center gap-2 px-4 py-2 text-gray-700 hover:text-red-600 transition"
@@ -76,7 +89,7 @@ const AppHeader: React.FC = () => {
         </div>
       </div>
 
-      {/* Menú desplegable en móviles con transición suave */}
+      {/* Menú desplegable en móviles */}
       <div
         className={`md:hidden overflow-hidden transition-all duration-500 ease-in-out ${
           isOpen ? "max-h-60 opacity-100" : "max-h-0 opacity-0"
@@ -84,10 +97,17 @@ const AppHeader: React.FC = () => {
       >
         <nav className="bg-white shadow-md">
           <ul className="flex flex-col items-center space-y-2 py-4">
-            <li></li>
+            {/* Saldo en móviles */}
+            <li
+              className={`font-semibold ${
+                balance >= 0 ? "text-green-600" : "text-red-600"
+              }`}
+            >
+              Capital: ${balance.toFixed(2)}
+            </li>
             <li>
               <Link
-                to="/profile"
+                to="/profile-user"
                 className="block px-4 py-2 text-gray-700 hover:text-blue-600"
                 onClick={() => setIsOpen(false)}
               >
