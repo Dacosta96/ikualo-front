@@ -27,7 +27,6 @@ const EditMovementModal: React.FC<EditMovementModalProps> = ({
   handleSubmit,
   isLoading,
 }) => {
-  console.log("formDataModal", formData);
   return (
     <Modal
       isOpen={isOpen}

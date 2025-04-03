@@ -17,13 +17,20 @@ interface Props {
 }
 
 export default function IncomeExpenseLineChart({ data = [] }: Props) {
+  if (data.length === 0) return <p>No hay datos disponibles</p>;
+
+  // Obtener la fecha mínima en los datos
+  const minDate = new Date(
+    Math.min(...data.map((item) => new Date(item.date).getTime()))
+  ).getTime();
+
   const options: ApexOptions = {
     legend: {
       show: true,
       position: "top",
       horizontalAlign: "left",
     },
-    colors: ["#10B981", "#EF4444"], // Green for income, Red for expenses
+    colors: ["#10B981", "#EF4444"],
     chart: {
       fontFamily: "Outfit, sans-serif",
       height: 310,
@@ -75,6 +82,7 @@ export default function IncomeExpenseLineChart({ data = [] }: Props) {
     xaxis: {
       type: "datetime",
       categories: data.map((item) => item.date),
+      min: minDate, // Establece la fecha mínima en el eje X
       axisBorder: {
         show: false,
       },
@@ -98,13 +106,13 @@ export default function IncomeExpenseLineChart({ data = [] }: Props) {
       name: "Income",
       data: data
         .filter((item) => item.type === "income")
-        .map((item) => item.amount),
+        .map((item) => ({ x: new Date(item.date).getTime(), y: item.amount })),
     },
     {
       name: "Expenses",
       data: data
         .filter((item) => item.type === "expense")
-        .map((item) => item.amount),
+        .map((item) => ({ x: new Date(item.date).getTime(), y: item.amount })),
     },
   ];
 

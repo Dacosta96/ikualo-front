@@ -29,20 +29,22 @@ export default function FinancialSummary({ data = [] }: Props) {
     totalIncome > 0 ? ((totalIncome - totalExpenses) / totalIncome) * 100 : 0;
 
   const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat("en-US", {
+    return new Intl.NumberFormat("es-ES", {
       style: "currency",
-      currency: "USD",
+      currency: "EUR", // Cambio a EUR para estar más acorde con España
       minimumFractionDigits: 0,
       maximumFractionDigits: 0,
     }).format(amount);
   };
-
+  console.log("Total Income:", netBalance);
   return (
     <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
       <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
         <div className="flex items-center justify-between">
           <div>
-            <p className="text-sm font-medium text-gray-600">Total Income</p>
+            <p className="text-sm font-medium text-gray-600">
+              Ingresos Totales
+            </p>
             <p className="mt-2 text-2xl font-semibold text-green-600">
               {formatCurrency(totalIncome)}
             </p>
@@ -56,7 +58,7 @@ export default function FinancialSummary({ data = [] }: Props) {
       <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
         <div className="flex items-center justify-between">
           <div>
-            <p className="text-sm font-medium text-gray-600">Total Expenses</p>
+            <p className="text-sm font-medium text-gray-600">Gastos Totales</p>
             <p className="mt-2 text-2xl font-semibold text-red-600">
               {formatCurrency(totalExpenses)}
             </p>
@@ -70,7 +72,7 @@ export default function FinancialSummary({ data = [] }: Props) {
       <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
         <div className="flex items-center justify-between">
           <div>
-            <p className="text-sm font-medium text-gray-600">Net Balance</p>
+            <p className="text-sm font-medium text-gray-600">Saldo Neto</p>
             <p
               className={`mt-2 text-2xl font-semibold ${
                 netBalance >= 0 ? "text-green-600" : "text-red-600"
@@ -96,7 +98,7 @@ export default function FinancialSummary({ data = [] }: Props) {
       <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
         <div className="flex items-center justify-between">
           <div>
-            <p className="text-sm font-medium text-gray-600">Savings Rate</p>
+            <p className="text-sm font-medium text-gray-600">Tasa de Ahorro</p>
             <p
               className={`mt-2 text-2xl font-semibold ${
                 savingsRate >= 0 ? "text-green-600" : "text-red-600"

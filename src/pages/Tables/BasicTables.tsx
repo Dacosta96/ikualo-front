@@ -15,7 +15,7 @@ import { toast } from "react-toastify";
 import { useBalance } from "../../context/BalanceContext";
 import { getUserByEmail } from "../../api/usersAction";
 import { format } from "date-fns";
-import { es } from "date-fns/locale";
+import { es as esLocale } from "date-fns/locale";
 
 const OrdersAdmin: React.FC = () => {
   const { user } = useUser();
@@ -64,12 +64,6 @@ const OrdersAdmin: React.FC = () => {
       const formattedMovements = movements.map((item: any) => ({
         ...item,
         id: item._id, // Asigna `_id` como `id`
-        type: item.type === "income" ? "Ingreso" : "Gasto", // Formatear type
-        date: format(new Date(item.date), "dd/MM/yyyy", { locale: es }), // Formatear fecha
-        amount: `$ ${new Intl.NumberFormat("es-ES", {
-          minimumFractionDigits: 1,
-          maximumFractionDigits: 1,
-        }).format(item.amount)}`,
       }));
 
       console.log(formattedMovements);
@@ -95,31 +89,76 @@ const OrdersAdmin: React.FC = () => {
   }, []);
   // Definición de columnas del DataGrid
   const columns: GridColDef[] = [
-    { field: "type", headerName: "Tipo", width: 100 },
-    { field: "description", headerName: "Descripción", flex: 1 },
-    { field: "amount", headerName: "Monto", flex: 1 },
-    { field: "date", headerName: "Fecha", flex: 1 },
+    {
+      field: "type",
+      headerName: "Tipo",
+      width: 100,
+      renderCell: (params: any) => {
+        const type = params.row?.type;
+        if (!type) return "—";
+        return type === "income"
+          ? "Ingreso"
+          : type === "expense"
+          ? "Gasto"
+          : type;
+      },
+    },
+    {
+      field: "description",
+      headerName: "Descripción",
+      flex: 1,
+    },
+    {
+      field: "amount",
+      headerName: "Monto",
+      flex: 1,
+      renderCell: (params: any) => {
+        const amount = params.row?.amount;
+        if (amount == null) return "—";
+        return `$ ${new Intl.NumberFormat("es-ES", {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2,
+        }).format(amount)}`;
+      },
+    },
+    {
+      field: "date",
+      headerName: "Fecha",
+      flex: 1,
+      renderCell: (params: any) => {
+        const date = params.row?.date;
+        if (!date) return "—";
+        try {
+          return format(new Date(date), "dd/MM/yyyy", { locale: esLocale });
+        } catch (error) {
+          console.error("Error formateando fecha:", date, error);
+          return "Fecha inválida";
+        }
+      },
+    },
     {
       field: "actions",
       headerName: "Acciones",
       width: 150,
       sortable: false,
-      renderCell: (params) => (
-        <>
-          <IconButton
-            color="primary"
-            onClick={(e) => handleEdit(e, params.row)}
-          >
-            <FiEdit size={20} />
-          </IconButton>
-          <IconButton color="error" onClick={() => handleDelete(params.row)}>
-            <FiTrash2 size={20} />
-          </IconButton>
-        </>
-      ),
+      renderCell: (params) => {
+        if (!params.row) return null;
+        return (
+          <>
+            <IconButton
+              color="primary"
+              onClick={(e) => handleEdit(e, params.row)}
+            >
+              <FiEdit size={20} />
+            </IconButton>
+            <IconButton color="error" onClick={() => handleDelete(params.row)}>
+              <FiTrash2 size={20} />
+            </IconButton>
+          </>
+        );
+      },
     },
   ];
-
   const handleChange = ({ name, value }: { name: string; value: string }) => {
     setFormData((prev) => ({
       ...prev,
@@ -180,10 +219,16 @@ const OrdersAdmin: React.FC = () => {
       fetchMovementsData();
       setOpenEditModal(false);
       setRowToEdit(null);
+      if (!response) {
+        toast.error("Error al actualizar el movimiento");
+        setIsLoadingEdit(false);
+      }
     } catch (error) {
       toast.error("Error al actualizar el movimiento");
       setIsLoadingEdit(false);
       console.error("Error actualizando el movimiento", error);
+    } finally {
+      setIsLoadingEdit(false);
     }
   };
   return (
@@ -220,7 +265,6 @@ const OrdersAdmin: React.FC = () => {
           sx={{
             "& .MuiDataGrid-root": { overflowX: "auto" },
             minHeight: "200px",
-            maxHeight: "calc(100vh - 200px)",
           }}
         />
       </div>

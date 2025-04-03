@@ -38,6 +38,7 @@ export const updateMovement = async (
   datamovement: EditMovementDTO
 ): Promise<any> => {
   try {
+    console.log("Updating movement", datamovement);
     const response = await axiosInstance.put(`movements`, datamovement);
     console.log("response", response);
     if (response.status !== 200) {

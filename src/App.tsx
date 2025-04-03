@@ -21,6 +21,7 @@ import ProtectedRoute from "./components/routes/ProtectedRoute";
 import ProfilePage from "./components/UserProfile/ProfileClerk";
 import { useAuth } from "@clerk/clerk-react";
 import LoadingSpinner from "./components/common/LoadingSpinner";
+import FinancialReports from "./pages/Reports/FinancialReports";
 
 export default function App() {
   const { isSignedIn, isLoaded } = useAuth();
@@ -39,6 +40,10 @@ export default function App() {
             <Route element={<ProtectedRoute />}>
               <Route element={<AppLayout />}>
                 <Route index path="/" element={<Home />} />
+                <Route
+                  path="/financial-reports"
+                  element={<FinancialReports />}
+                />
                 <Route path="/profile-user" element={<ProfilePage />} />
                 <Route path="/calendar" element={<Calendar />} />
                 <Route path="/blank" element={<Blank />} />

@@ -219,37 +219,50 @@ export default function Home() {
         {transactions.length === 0 ? (
           <p>No hay movimientos registrados.</p>
         ) : (
-          <ul className="space-y-2">
-            {transactions.map((tx, index) => (
-              <li
-                key={index}
-                className={`flex flex-wrap items-center p-2 rounded ${
-                  tx.type === "income" ? "bg-green-100" : "bg-red-100"
-                }`}
-              >
-                {/* Ícono */}
-                <span className="text-2xl mr-2">
-                  {tx.type === "income" ? (
-                    <FiArrowDownCircle className="text-green-600" />
-                  ) : (
-                    <FiArrowUpCircle className="text-red-600" />
-                  )}
-                </span>
-
-                {/* Información del movimiento */}
-                <div className="flex flex-col md:flex-row md:items-center gap-2 w-full text-sm md:text-base">
-                  <strong>
-                    {tx.type === "income" ? "Ingreso" : "Egreso"}:
-                  </strong>
-                  <span>${tx.amount.toFixed(2)}</span>
-                  <span>{tx.description}</span>
-                  <span className="text-gray-500">
-                    {new Date(tx.date).toLocaleDateString("es-ES")}
+          <>
+            <ul className="space-y-2">
+              {transactions.slice(0, 5).map((tx, index) => (
+                <li
+                  key={index}
+                  className={`flex flex-wrap items-center p-2 rounded ${
+                    tx.type === "income" ? "bg-green-100" : "bg-red-100"
+                  }`}
+                >
+                  {/* Ícono */}
+                  <span className="text-2xl mr-2">
+                    {tx.type === "income" ? (
+                      <FiArrowDownCircle className="text-green-600" />
+                    ) : (
+                      <FiArrowUpCircle className="text-red-600" />
+                    )}
                   </span>
-                </div>
-              </li>
-            ))}
-          </ul>
+
+                  {/* Información del movimiento */}
+                  <div className="flex flex-col md:flex-row md:items-center gap-2 w-full text-sm md:text-base">
+                    <strong>
+                      {tx.type === "income" ? "Ingreso" : "Egreso"}:
+                    </strong>
+                    <span>${tx.amount.toFixed(2)}</span>
+                    <span>{tx.description}</span>
+                    <span className="text-gray-500">
+                      {new Date(tx.date).toLocaleDateString("es-ES")}
+                    </span>
+                  </div>
+                </li>
+              ))}
+            </ul>
+
+            {/* Mensaje si hay más de 5 registros */}
+            {transactions.length > 5 && (
+              <p className="mt-4 font-medium">
+                Para ver más registros, ve a{" "}
+                <a href="/basic-tables" className="underline">
+                  Detalles
+                </a>
+                .
+              </p>
+            )}
+          </>
         )}
       </div>
     </div>

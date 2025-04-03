@@ -17,81 +17,88 @@ interface Props {
 }
 
 export default function MonthlyBalanceChart({ data = [] }: Props) {
+  // Procesamos los datos para agrupar por mes
+  const monthlyData = data.reduce((acc, item) => {
+    const date = new Date(item.date);
+    const monthKey = `${date.getFullYear()}-${(date.getMonth() + 1)
+      .toString()
+      .padStart(2, "0")}`;
+    const amount = item.type === "income" ? item.amount : -item.amount;
+
+    if (!acc[monthKey]) {
+      acc[monthKey] = 0;
+    }
+    acc[monthKey] += amount;
+
+    return acc;
+  }, {} as Record<string, number>);
+
+  const sortedMonthKeys = Object.keys(monthlyData).sort();
+
+  const categories = sortedMonthKeys.map((monthKey) => {
+    const [year, month] = monthKey.split("-");
+    const date = new Date(parseInt(year), parseInt(month) - 1, 1);
+    return date.toLocaleDateString("es-ES", {
+      month: "short",
+      year: "numeric",
+    });
+  });
+
   const options: ApexOptions = {
-    colors: ["#3B82F6"],
     chart: {
-      fontFamily: "Outfit, sans-serif",
       type: "bar",
-      height: 180,
-      toolbar: {
-        show: false,
-      },
+      height: 350,
+      toolbar: { show: false },
     },
     plotOptions: {
       bar: {
         horizontal: false,
-        columnWidth: "39%",
+        columnWidth: "45%",
         borderRadius: 5,
-        borderRadiusApplication: "end",
       },
-    },
-    dataLabels: {
-      enabled: false,
-    },
-    stroke: {
-      show: true,
-      width: 4,
-      colors: ["transparent"],
     },
     xaxis: {
-      type: "datetime",
-      categories: data.map((item) => item.date),
-      axisBorder: {
-        show: false,
-      },
-      axisTicks: {
-        show: false,
-      },
-    },
-    legend: {
-      show: false,
-    },
-    yaxis: {
+      categories: categories,
       labels: {
-        formatter: (value) => `$${value.toLocaleString()}`,
-      },
-    },
-    grid: {
-      yaxis: {
-        lines: {
-          show: true,
+        formatter: function (value) {
+          return value;
+        },
+        style: {
+          fontSize: "12px",
         },
       },
     },
-    fill: {
-      opacity: 1,
+    yaxis: {
+      labels: {
+        formatter: (value) => `$${Math.round(value).toLocaleString()}`,
+      },
     },
     tooltip: {
       y: {
-        formatter: (val: number) => `$${val.toLocaleString()}`,
+        formatter: (val: number) =>
+          `$${val.toLocaleString(undefined, {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+          })}`,
       },
+    },
+    colors: ["#008FFB"],
+    dataLabels: {
+      enabled: false,
     },
   };
 
   const series = [
     {
-      name: "Balance",
-      data: data.map((item) => {
-        const amount = item.type === "income" ? item.amount : -item.amount;
-        return amount;
-      }),
+      name: "Balance Mensual",
+      data: sortedMonthKeys.map((monthKey) => monthlyData[monthKey]),
     },
   ];
 
   return (
-    <div className="max-w-full overflow-x-auto custom-scrollbar">
-      <div id="monthlyBalanceChart" className="min-w-[1000px]">
-        <Chart options={options} series={series} type="bar" height={180} />
+    <div className="max-w-full overflow-x-auto">
+      <div id="monthlyBalanceChart">
+        <Chart options={options} series={series} type="bar" height={350} />
       </div>
     </div>
   );
