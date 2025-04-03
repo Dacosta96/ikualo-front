@@ -13,6 +13,7 @@ export default function SignInForm() {
   const navigate = useNavigate();
 
   const [showPassword, setShowPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -37,6 +38,7 @@ export default function SignInForm() {
     if (!isLoaded) return;
 
     try {
+      setIsLoading(true);
       const result = await signIn.create({
         identifier: formData.email,
         password: formData.password,
@@ -49,6 +51,8 @@ export default function SignInForm() {
     } catch (err) {
       setError("Credenciales incorrectas. Intenta de nuevo.");
       console.error("Error de autenticación:", err);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -107,7 +111,7 @@ export default function SignInForm() {
               {error && <p className="text-error-500">{error}</p>}
 
               <div>
-                <Button className="w-full" size="sm">
+                <Button className="w-full" size="sm" isLoading={isLoading}>
                   Iniciar sesión
                 </Button>
               </div>

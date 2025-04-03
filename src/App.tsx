@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route } from "react-router";
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router";
 import SignIn from "./pages/AuthPages/SignIn";
 import SignUp from "./pages/AuthPages/SignUp";
 import NotFound from "./pages/OtherPage/NotFound";
@@ -19,39 +19,50 @@ import { ScrollToTop } from "./components/common/ScrollToTop";
 import Home from "./pages/Dashboard/Home";
 import ProtectedRoute from "./components/routes/ProtectedRoute";
 import ProfilePage from "./components/UserProfile/ProfileClerk";
+import { useAuth } from "@clerk/clerk-react";
+import LoadingSpinner from "./components/common/LoadingSpinner";
 
 export default function App() {
+  const { isSignedIn, isLoaded } = useAuth();
+
+  if (!isLoaded) {
+    return <LoadingSpinner />;
+  }
+
   return (
     <>
       <Router>
         <ScrollToTop />
         <Routes>
           {/* Protected Routes */}
-          <Route element={<ProtectedRoute />}>
-            <Route element={<AppLayout />}>
-              <Route index path="/" element={<Home />} />
-              <Route path="/profile-user" element={<ProfilePage />} />
-              <Route path="/calendar" element={<Calendar />} />
-              <Route path="/blank" element={<Blank />} />
-              <Route path="/form-elements" element={<FormElements />} />
-              <Route path="/basic-tables" element={<BasicTables />} />
-              <Route path="/alerts" element={<Alerts />} />
-              <Route path="/avatars" element={<Avatars />} />
-              <Route path="/badge" element={<Badges />} />
-              <Route path="/buttons" element={<Buttons />} />
-              <Route path="/images" element={<Images />} />
-              <Route path="/videos" element={<Videos />} />
-              <Route path="/line-chart" element={<LineChart />} />
-              <Route path="/bar-chart" element={<BarChart />} />
+          {isSignedIn && (
+            <Route element={<ProtectedRoute />}>
+              <Route element={<AppLayout />}>
+                <Route index path="/" element={<Home />} />
+                <Route path="/profile-user" element={<ProfilePage />} />
+                <Route path="/calendar" element={<Calendar />} />
+                <Route path="/blank" element={<Blank />} />
+                <Route path="/form-elements" element={<FormElements />} />
+                <Route path="/basic-tables" element={<BasicTables />} />
+                <Route path="/alerts" element={<Alerts />} />
+                <Route path="/avatars" element={<Avatars />} />
+                <Route path="/badge" element={<Badges />} />
+                <Route path="/buttons" element={<Buttons />} />
+                <Route path="/images" element={<Images />} />
+                <Route path="/videos" element={<Videos />} />
+                <Route path="/line-chart" element={<LineChart />} />
+                <Route path="/bar-chart" element={<BarChart />} />
+                <Route path="*" element={<NotFound />} />
+              </Route>
             </Route>
-          </Route>
+          )}
 
           {/* Auth Routes */}
           <Route path="/signin" element={<SignIn />} />
           <Route path="/signup" element={<SignUp />} />
 
-          {/* Fallback Route */}
-          <Route path="*" element={<NotFound />} />
+          {/* add router redirect when / */}
+          <Route path="*" element={<Navigate to="/signin" />} />
         </Routes>
       </Router>
     </>
