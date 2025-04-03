@@ -20,7 +20,7 @@ const AppHeader: React.FC = () => {
 
   return (
     <header className="bg-white shadow-md mb-2">
-      <div className="max-w-screen-xl mx-auto flex items-center justify-between p-4">
+      <div className="max-w-screen-xl mx-auto flex items-center justify-between">
         {/* Logo */}
         <Link to="/home" className="flex items-center">
           <img src="/" alt="Logo" className="h-16 md:h-20 lg:h-24 w-auto" />

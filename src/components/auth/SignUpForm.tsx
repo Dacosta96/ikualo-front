@@ -11,7 +11,8 @@ import "react-toastify/dist/ReactToastify.css";
 
 export default function SignUpForm() {
   const [formData, setFormData] = useState({
-    name: "",
+    firstName: "",
+    lastName: "",
     email: "",
     password: "",
   });
@@ -30,11 +31,15 @@ export default function SignUpForm() {
     setLoading(true);
     try {
       const response = await createUser({
-        name: formData.name,
+        firstName: formData.firstName,
+        lastName: formData.lastName,
         email: formData.email,
         password: formData.password,
-        role: "user",
       });
+      if (!response) {
+        toast.error("Error al registrar el usuario");
+        return;
+      }
       console.log("Registro exitoso:", response);
       toast.success("Usuario registrado correctamente");
       navigate("/signin");
@@ -69,10 +74,25 @@ export default function SignUpForm() {
                   </Label>
                   <Input
                     type="text"
-                    id="name"
-                    name="name"
+                    id="firstName"
+                    name="firstName"
                     placeholder="Ingresa tu nombre"
-                    value={formData.name}
+                    value={formData.firstName}
+                    onChange={handleInputChange}
+                    required
+                  />
+                </div>
+                {/* Apellido */}
+                <div>
+                  <Label>
+                    Apellido<span className="text-error-500">*</span>
+                  </Label>
+                  <Input
+                    type="text"
+                    id="lastName"
+                    name="lastName"
+                    placeholder="Ingresa tu nombre"
+                    value={formData.lastName}
                     onChange={handleInputChange}
                     required
                   />

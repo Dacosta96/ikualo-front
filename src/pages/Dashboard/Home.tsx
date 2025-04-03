@@ -1,6 +1,7 @@
 import { useState } from "react";
 import PageBreadcrumb from "../../components/common/PageBreadCrumb";
 import PageMeta from "../../components/common/PageMeta";
+import axiosInstance from "../../api/api";
 
 interface Transaction {
   type: "income" | "expense";
@@ -17,6 +18,8 @@ export default function Home() {
     description: "",
     date: new Date().toISOString().split("T")[0],
   });
+
+  console.log("formData", axiosInstance.get(""));
 
   const handleChange = (
     e: React.ChangeEvent<

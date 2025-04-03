@@ -22,17 +22,7 @@ export default function SignInForm() {
 
   useEffect(() => {
     if (isSignedIn && user) {
-      //console.log("Datos del usuario:", user);
-      //console.log("publicMetadata:", user.publicMetadata);
-
-      const userRole = user.publicMetadata?.role as string;
-      console.log("Rol del usuario:", userRole);
-
-      if (userRole === "ADMIN") {
-        navigate("/");
-      } else {
-        navigate("/home");
-      }
+      navigate("/");
     }
   }, [isSignedIn, user, navigate]);
 
